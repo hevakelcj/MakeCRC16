@@ -3,10 +3,14 @@
 
 #include <QDialog>
 #include <QString>
+#include <QMap>
+#include "type.h"
 
 namespace Ui {
 class Dialog;
 }
+
+typedef INT16U (*MakeFunc) (const INT8U*, INT16U);
 
 class Dialog : public QDialog
 {
@@ -24,6 +28,7 @@ protected slots:
 
 private:
     Ui::Dialog *ui;
+    QMap<QString, MakeFunc> m_method_map;
     bool m_isLittleEndian;
 };
 

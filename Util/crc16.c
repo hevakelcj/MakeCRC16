@@ -51,7 +51,7 @@ static const INT8U aucCRCLo[] = {
 };
 
 
-INT16U GenerateCRC16(INT8U *pdata, INT16U len)
+INT16U GenerateCRC16(const INT8U *pdata, INT16U len)
 {
     INT8U    CRCHi = 0xFF; 
     INT8U    CRCLo = 0xFF; 

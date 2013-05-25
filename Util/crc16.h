@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-extern INT16U GenerateCRC16(INT8U *pdata, INT16U len); 
+extern INT16U GenerateCRC16(const INT8U *pdata, INT16U len);
 
 #ifdef   __cplusplus
 }

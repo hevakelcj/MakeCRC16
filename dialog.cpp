@@ -1,13 +1,14 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "Util/crc16.h"
-#include <QDebug>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+
+    m_method_map["CRC16"] = GenerateCRC16;
 }
 
 Dialog::~Dialog()
@@ -28,12 +29,14 @@ void Dialog::on_endian_clicked(bool isBigEndian)
 
 void Dialog::make_crc16()
 {
+    ui->len_out->setText("");
+    ui->len_out_hex->setText("");
+    ui->crc16_out->setText("");
+
     QString text = ui->data_in->toPlainText();
-    qDebug() << text;
     QStringList textArray = text.split(" ");
 
     int data_len = textArray.length();
-    ui->len_out->setText(QString().sprintf("%d", data_len));
     if (data_len == 0)
         return;
 
@@ -48,8 +51,11 @@ void Dialog::make_crc16()
         data_buff[i] = value;
     }
 
-    if (ok) {
-        quint16 crc = GenerateCRC16(data_buff, data_len);
+    QString curr_method = ui->method->currentText();
+    MakeFunc make_func = m_method_map[curr_method];
+
+    if (ok && make_func) {
+        quint16 crc = (*make_func)(data_buff, data_len);
         quint8 tmp[2];
 
         if (m_isLittleEndian) {
@@ -59,8 +65,10 @@ void Dialog::make_crc16()
             tmp[1] = crc & 0xff;
             tmp[0] = crc >> 8;
         }
-        QString output = QString().sprintf("%02X %02X", tmp[0], tmp[1]);
-        ui->crc16_out->setText(output);
+
+        ui->crc16_out->setText(QString().sprintf("%02X %02X", tmp[0], tmp[1]));
+        ui->len_out->setText(QString().sprintf("%d", data_len));
+        ui->len_out_hex->setText(QString().sprintf("%02X", data_len));
     }
 
     delete [] data_buff;
